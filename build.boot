@@ -1,5 +1,10 @@
 (set-env!
+ :dependencies '[[org.clojure/clojure "1.9.0"]
+                 [degree9/boot-semver "1.7.0" :scope "test"]]
  :resource-paths #{"src"})
+
+(require
+ '[degree9.boot-semver :refer :all])
 
 (task-options!
  pom    {:project 'degree9/covenant
