@@ -75,6 +75,7 @@
   (assert   [covenant data] "See clojure.spec/assert.")
   (conform  [covenant data] "See clojure.spec/conform.")
   (explain  [covenant data] "See clojure.spec/explain.")
+  (problems [covenant data] "See clojure.spec/explain-data.")
   (validate [covenant data] "See clojure.spec/valid?.")
   (spec     [covenant]      "Returns related spec for `covenant`."))
 
@@ -87,6 +88,8 @@
     (spec/conform (spec covenant) data))
   (explain  [covenant data]
     (spec/explain (spec covenant) data))
+  (problems  [covenant data]
+    (spec/explain-data (spec covenant) data))
   (validate [covenant data]
     (spec/valid?  (spec covenant) data))
 
