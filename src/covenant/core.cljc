@@ -4,7 +4,7 @@
     #?(:clj [clojure.spec.alpha :as spec]
        :cljs [cljs.spec.alpha :as spec])))
 
-;; Basic Specs ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Basic Covenants ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (spec/def ::fn      fn?)
 
 (spec/def ::any     any?)
@@ -30,129 +30,132 @@
 (spec/def ::vector  vector?)
 
 (spec/def ::keyword keyword?)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Spec Helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defn spec*
-  "Returns default spec based on `schema`."
-  [schema & [spec]]
-  (or (spec/get-spec schema) spec))
+;; Covenant Helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defn covenant*
+  "Returns a spec from `covenant` or `default`"
+  [covenant & [default]]
+  (or (spec/get-spec covenant) default))
 
-(defn schema-kv
-  "Returns a spec where `schema` is equal to `data` for a kv pair.
+(defn covenant-kv
+  "Returns a spec where `covenant` is equal to `data` for a kv pair.
 
    Use :strict true to fail valiation for additional keys."
-  [schema & [{:keys [strict]}]]
+  [covenant & [{:keys [strict]}]]
   (fn [data]
     (let [k (if (vector? data) (key data) data)
           v (if (vector? data) (val data) data)]
-      (= v (get schema k (when-not strict v))))))
+      (= v (get covenant k (when-not strict v))))))
 
-(defn schema-equal
-  "Returns a spec where `data` equals `schema`."
-  [schema]
+(defn covenant-equal
+  "Returns a spec where `data` equals `covenant`."
+  [covenant]
   (fn [data]
-    (= schema data)))
+    (= covenant data)))
 
-(defn schema-spec
-  "Returns a spec from `schema` or based on `data` type."
-  [schema]
+(defn covenant-spec
+  "Returns a spec from `covenant` or based on `data` type."
+  [covenant]
   (fn [data]
     (let [k (if (vector? data) (key data) data)
           v (if (vector? data) (val data) data)]
-      (spec* (get schema k v)))))
+      (covenant* (get covenant k v)))))
 
-(defn schema-contains
-  "Returns a spec where items within `schema` contain `data`."
-  [schema]
+(defn covenant-contains
+  "Returns a spec where items within `covenant` contain `data`."
+  [covenant]
   (fn [data]
-    (some #{data} schema)))
+    (some #{data} covenant)))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Covenant Protocol ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defprotocol ICovenant
-  "Provides an abstraction for validating data using clojure.spec based on a data schema."
-  (assert   [schema data] "See clojure.spec/assert.")
-  (conform  [schema data] "See clojure.spec/conform.")
-  (explain  [schema data] "See clojure.spec/explain.")
-  (validate [schema data] "See clojure.spec/valid?.")
-  (spec     [schema]      "Returns related spec for `schema`."))
+  "Provides an abstraction for validating data using clojure.spec based on a covenant."
+  (assert   [covenant data] "See clojure.spec/assert.")
+  (conform  [covenant data] "See clojure.spec/conform.")
+  (explain  [covenant data] "See clojure.spec/explain.")
+  (problems [covenant data] "See clojure.spec/explain-data.")
+  (validate [covenant data] "See clojure.spec/valid?.")
+  (spec     [covenant]      "Returns related spec for `covenant`."))
 
 (extend-protocol ICovenant
 
   default
-  (assert   [schema data]
-    (spec/assert  (spec schema) data))
-  (conform  [schema data]
-    (spec/conform (spec schema) data))
-  (explain  [schema data]
-    (spec/explain (spec schema) data))
-  (validate [schema data]
-    (spec/valid?  (spec schema) data))
+  (assert   [covenant data]
+    (spec/assert  (spec covenant) data))
+  (conform  [covenant data]
+    (spec/conform (spec covenant) data))
+  (explain  [covenant data]
+    (spec/explain (spec covenant) data))
+  (problems  [covenant data]
+    (spec/explain-data (spec covenant) data))
+  (validate [covenant data]
+    (spec/valid?  (spec covenant) data))
 
   nil
-  (spec [schema]
-    (spec* schema ::nil))
+  (spec [covenant]
+    (covenant* covenant ::nil))
 
   number
-  (spec [schema]
-    (spec* schema ::number))
+  (spec [covenant]
+    (covenant* covenant ::number))
 
   char
-  (spec [schema]
-    (spec* schema ::char))
+  (spec [covenant]
+    (covenant* covenant ::char))
 
   string
-  (spec [schema]
-    (spec* schema ::string))
+  (spec [covenant]
+    (covenant* covenant ::string))
 
   boolean
-  (spec [schema]
-    (spec* schema ::bool))
+  (spec [covenant]
+    (covenant* covenant ::bool))
 
   Keyword
-  (spec [schema]
-    (spec* schema ::keyword))
+  (spec [covenant]
+    (covenant* covenant ::keyword))
 
   Symbol
-  (spec [schema]
-    (spec* schema ::symbol))
+  (spec [covenant]
+    (covenant* covenant ::symbol))
 
   function
-  (spec [schema]
+  (spec [covenant]
     (spec/and ::fn
-      (schema-equal schema)))
+      (covenant-equal covenant)))
 
   List
-  (spec [schema]
+  (spec [covenant]
     (spec/and ::list
       (spec/coll-of
         (spec/and
-          (schema-spec schema)
-          (schema-contains schema)))))
+          (covenant-spec covenant)
+          (covenant-contains covenant)))))
 
   PersistentVector
-  (spec [schema]
+  (spec [covenant]
     (spec/and ::vector
       (spec/coll-of
         (spec/and
-          (schema-spec schema)
-          (schema-contains schema)))))
+          (covenant-spec covenant)
+          (covenant-contains covenant)))))
 
   PersistentHashSet
-  (spec [schema]
+  (spec [covenant]
     (spec/and ::set
       (spec/coll-of
         (spec/and
-          (schema-spec schema)
-          (schema-contains schema)))))
+          (covenant-spec covenant)
+          (covenant-contains covenant)))))
 
   PersistentArrayMap
-  (spec [schema]
+  (spec [covenant]
     (spec/merge ::map
-      (spec/keys :req-un (keys schema))
+      (spec/keys :req-un (keys covenant))
       (spec/coll-of
         (spec/or
-          :spec (schema-spec schema)
-          :kv   (schema-kv schema))))))
-
-;(explain {:test "sup"} {:test "sup"})
-;(explain {:go "have" :some ['fun]} {:go "have" :some ['soup]})
+          :spec (covenant-spec covenant)
+          :kv   (covenant-kv covenant))))))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
