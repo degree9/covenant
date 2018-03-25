@@ -1,4 +1,8 @@
-(ns covenant.core)
+(ns covenant.core
+  (:refer-clojure :exclude [assert])
+  (:require
+    #?(:clj [clojure.spec.alpha :as spec]
+       :cljs [cljs.spec.alpha :as spec])))
 
 ;; Basic Specs ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (spec/def ::fn      fn?)
