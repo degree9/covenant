@@ -33,10 +33,6 @@ Within this project the term `covenant` may refer to one the following:
 ; =>
 ;Success!
 
-(spec/explain 1 2)
-; =>
-;Success!
-
 (spec/explain [1 2 3] [4 5 6])
 ; =>
 ;In: [0] val: 4 fails predicate: (covenant-spec covenant)

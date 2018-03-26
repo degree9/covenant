@@ -58,9 +58,8 @@
   "Returns a spec from `covenant` or based on `data` type."
   [covenant]
   (fn [data]
-    (let [k (if (vector? data) (key data) data)
-          v (if (vector? data) (val data) data)]
-      (covenant* (get covenant k v)))))
+    (let [data (if (vector? data) (key data) data)]
+      (covenant* (get covenant data) covenant))))
 
 (defn covenant-contains
   "Returns a spec where items within `covenant` contain `data`."
@@ -130,17 +129,15 @@
   (spec [covenant]
     (spec/and ::list
       (spec/coll-of
-        (spec/and
-          (covenant-spec covenant)
-          (covenant-contains covenant)))))
+        (spec/or
+          :contains (covenant-contains covenant)))))
 
   PersistentVector
   (spec [covenant]
     (spec/and ::vector
       (spec/coll-of
-        (spec/and
-          (covenant-spec covenant)
-          (covenant-contains covenant)))))
+        (spec/or
+          :contains (covenant-contains covenant)))))
 
   PersistentHashSet
   (spec [covenant]
