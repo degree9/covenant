@@ -11,8 +11,7 @@
 (def chrs #{\a \b \c})
 (def keywords #{:foo :bar :foo/bar :foo.bar/baz})
 (def symbols #{'foo 'bar 'foo/bar 'foo.bar/baz})
-; https://github.com/degree9/covenant/issues/10
-; (def objects #{(js-obj) (clj->js {:foo :bar})})
+(def objects #{(js-obj) (clj->js {:foo :bar})})
 (def maps #{{:foo :bar} {1 2} {:foo :foo} {}})
 (def sets #{#{:foo} #{} #{1}})
 (def vectors #{[] [:foo :bar] [1 2]})
@@ -25,7 +24,7 @@
   falseys
   strings
   chrs
-  ; objects
+  objects
   maps
   sets
   vectors

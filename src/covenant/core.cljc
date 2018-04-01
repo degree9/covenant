@@ -30,6 +30,8 @@
 (spec/def ::vector  vector?)
 
 (spec/def ::keyword keyword?)
+
+(spec/def ::object  object?)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Covenant Helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -91,6 +93,10 @@
     (spec/explain-data (spec covenant) data))
   (validate [covenant data]
     (spec/valid?  (spec covenant) data))
+
+  object
+  (spec [covenant]
+    (covenant* covenant ::object))
 
   nil
   (spec [covenant]
