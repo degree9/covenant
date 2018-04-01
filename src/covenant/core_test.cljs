@@ -5,7 +5,7 @@
   [cljs.test :refer-macros [deftest is are]]))
 
 (def bools #{true false})
-(def numbers #{-1 0 1 2 2.5 0.0 ##NaN js/Infinity})
+(def numbers #{-1 0 1 2 2.5 0.0 js/Infinity})
 (def falseys #{nil false})
 (def strings #{"foo" ""})
 (def chrs #{\a \b \c})
@@ -37,12 +37,12 @@
     everything
     valids)))
  ([covenant valids invalids]
-  (doseq [v (vals valids)]
+  (doseq [v valids]
    (is
     (covenant.core/validate covenant v)
     (str "Failed to validate " (pr-str v) " against covenant " covenant)))
 
-  (doseq [v (vals invalids)]
+  (doseq [v invalids]
    (is
     (not (covenant.core/validate covenant v))
     (str "Failed to invalidate " (pr-str v) " against covenant " covenant)))))
@@ -51,16 +51,13 @@
  (check-validate :covenant.core/fn fns))
 
 (deftest ??any
- (let [invalids falseys]
-  (check-validate :covenant.core/any
-   (clojure.set/difference everything invalids)
-   invalids)))
+ (check-validate :covenant.core/any everything))
 
 (deftest ??map
  (check-validate :covenant.core/map maps))
 
 (deftest ??nil
- (check-validate :covenant.core/nil nil))
+ (check-validate :covenant.core/nil #{nil}))
 
 (deftest ??set
  (check-validate :covenant.core/set sets))
