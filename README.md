@@ -12,7 +12,7 @@ Covenant is divided into a few namespaces:
 - `covenant.core` compares data structures and enables creation of spec's from data.
 - `covenant.acl` provides covenants around Access Control List's (ACL)
 - `covenant.roles` provides covenants around Role Based Access Control (RBAC)
-- `covenant.attributes` provides covenants around Attribute Based Access Control (RBAC)
+- `covenant.attributes` provides covenants around Attribute Based Access Control (ABAC)
 
 Within this project the term `covenant` may refer to one the following:
 
