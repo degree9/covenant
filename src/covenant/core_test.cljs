@@ -2,7 +2,7 @@
  (:require
   covenant.core
   clojure.set
-  [cljs.test :refer-macros [deftest is are]]))
+  [cljs.test :refer-macros [deftest is]]))
 
 (def bools #{true false})
 (def numbers #{-1 0 1 2 2.5 0.0 js/Infinity})
