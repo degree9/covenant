@@ -21,25 +21,71 @@ Within this project the term `covenant` may refer to one the following:
 3. Any combination of 1. and 2.
 
 ### Notes on Comparison ###
+
 - When comparing primitives, types are compared not values.
 - When comparing lists, contents are compared.
 
 ## Usage ##
 
-`covenant.core :as spec`:
+### Protocol fns
+
+Covenant exposes a protocol that closely matches cljs native spec.
 
 ```clojure
-(spec/explain :covenant.core/number 1)
+(defprotocol ICovenant
+  "Provides an abstraction for validating data using clojure.spec based on a covenant."
+  (assert   [covenant data] "See clojure.spec/assert.")
+  (conform  [covenant data] "See clojure.spec/conform.")
+  (explain  [covenant data] "See clojure.spec/explain.")
+  (problems [covenant data] "See clojure.spec/explain-data.")
+  (validate [covenant data] "See clojure.spec/valid?.")
+  (spec     [covenant]      "Returns related spec for `covenant`."))
+```
+
+The `spec` function will return a spec based on the passed data.
+
+A simple example is that `(covenant.core/spec nil)` will return
+`:covenant.core/nil` which is preregistered with spec as
+`(clojure.spec.alpha/def :covenant.core/nil nil?)`.
+
+Scalar primitives simply return a spec/predicate based on their data type while
+collections also compare their contents.
+
+### Examples
+
+`(:require covenant.core :as covenant)`
+
+For more examples check out the test suite.
+
+A vanilla spec + scalar primitive will pass `covenant/explain`.
+
+```clojure
+(covenant/explain :covenant.core/number 1)
 ; =>
 ;Success!
+```
 
-(spec/explain [1 2 3] [4 5 6])
+Scalar values can be used as a covenant for other values of the same type.
+
+```clojure
+(covenant/validate true true) ; true
+(covenant/validate true false) ; true
+(covenant/validate true 1) ; false
+(covenant/validate 1 1) ; true
+(covenant/validate 1 0) ; true
+(covenant/validate 1 false) ; false
+```
+
+A collection is compared against its type _and_ values.
+
+```clojure
+(covenant/explain [1 2 3] [4 5 6])
 ; =>
 ;In: [0] val: 4 fails predicate: (covenant-spec covenant)
 ;In: [1] val: 5 fails predicate: (covenant-spec covenant)
 ;In: [2] val: 6 fails predicate: (covenant-spec covenant)
 
-(spec/explain {:go "have" :some ['fun]} {:go "have" :some ['soup]} )
+(covenant/explain {:go "have" :some ['fun]} {:go "have" :some ['soup]} )
 ; =>
 ;In: [1] val: [:some [soup]] fails at: [:spec] predicate: (covenant-spec covenant)
 ;In: [1] val: [:some [soup]] fails at: [:kv] predicate: (covenant-kv covenant)
