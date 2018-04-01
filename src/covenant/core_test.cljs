@@ -9,6 +9,8 @@
 (def falseys #{nil false})
 (def strings #{"foo" ""})
 (def chrs #{\a \b \c})
+(def keywords #{:foo :bar :foo/bar :foo.bar/baz})
+(def symbols #{'foo 'bar 'foo/bar 'foo.bar/baz})
 (def objects #{(js-obj) (clj->js {:foo :bar})})
 (def maps #{{:foo :bar} {1 2} {:foo :foo} {}})
 (def sets #{#{:foo} #{} #{1}})
@@ -64,3 +66,24 @@
 
 (deftest ??char
  (check-validate :covenant.core/char chrs))
+
+(def ??list
+ (check-validate :covenant.core/list lists))
+
+(def ??boolean
+ (check-validate :covenant.core/bool bools))
+
+(def ??number
+ (check-validate :covenant.core/number numbers))
+
+(def ??string
+ (check-validate :covenant.core/string (clojure.set/union strings chrs)))
+
+(def ??symbol
+ (check-validate :covenant.core/symbol symbols))
+
+(def ??vector
+ (check-validate :covenant.core/vector vectors))
+
+(def ??keyword
+ (check-validate :covenant.core/keyword keywords))
