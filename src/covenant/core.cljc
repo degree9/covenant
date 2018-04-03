@@ -67,7 +67,7 @@
   "Returns a spec where items within `covenant` contain `data`."
   [covenant]
   (fn [data]
-    (some #{data} covenant)))
+    (some (set covenant) (if (coll? data) data (list data)))))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Covenant Protocol ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -135,30 +135,24 @@
   (spec [covenant]
     (spec/and ::list
       (spec/coll-of
-        (spec/or
-          :contains (covenant-contains covenant)))))
+        (covenant-contains covenant))))
 
   PersistentVector
   (spec [covenant]
     (spec/and ::vector
       (spec/coll-of
-        (spec/or
-          :contains (covenant-contains covenant)))))
+        (covenant-contains covenant))))
 
   PersistentHashSet
   (spec [covenant]
     (spec/and ::set
       (spec/coll-of
-        (spec/and
-          (covenant-spec covenant)
-          (covenant-contains covenant)))))
+        (covenant-contains covenant))))
 
   PersistentArrayMap
   (spec [covenant]
     (spec/merge ::map
       (spec/keys :req-un (keys covenant))
       (spec/coll-of
-        (spec/or
-          :spec (covenant-spec covenant)
-          :kv   (covenant-kv covenant))))))
+        (covenant-kv covenant)))))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

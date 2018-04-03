@@ -45,12 +45,12 @@
     (covenant.core/validate covenant v)
     (str "Failed to validate " (pr-str v) " against covenant " covenant)))
 
-   ; https://github.com/degree9/covenant/issues/11
-   ; v should also be usable as a covenant for every other valid
-   ; (doseq [v' valids]
-   ;  (is
-   ;   (covenant.core/validate v v')
-   ;   (str "Failed to validate " (pr-str v') "against covenant " (pr-str v)))))
+  ; https://github.com/degree9/covenant/issues/11
+  ; v should also be usable as a covenant for every other valid
+  ;(doseq [v' valids]
+  ;  (is
+  ;    (covenant.core/validate v v')
+  ;    (str "Failed to validate " (pr-str v') "against covenant " (pr-str v)))))
 
   (doseq [v invalids]
    (is
