@@ -47,10 +47,10 @@
 
   ; https://github.com/degree9/covenant/issues/11
   ; v should also be usable as a covenant for every other valid
-  ;(doseq [v' valids]
+  ;(doseq [v valids]
   ;  (is
-  ;    (covenant.core/validate v v')
-  ;    (str "Failed to validate " (pr-str v') "against covenant " (pr-str v)))))
+  ;    (covenant.core/validate v v)
+  ;    (str "Failed to validate " (pr-str v) "against covenant " (pr-str v)))))
 
   (doseq [v invalids]
    (is
@@ -98,6 +98,7 @@
 
 (def ??val-as-covenant
  (doseq [v everything]
+   (covenant.core/explain v v)
   (is
    (covenant.core/validate v v)
    (str "Failed to validate " (pr-str v) " against itself."))))

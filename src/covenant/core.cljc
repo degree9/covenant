@@ -32,42 +32,8 @@
 (spec/def ::keyword keyword?)
 
 (spec/def ::object  object?)
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Covenant Helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defn covenant*
-  "Returns a spec from `covenant` or `default`"
-  [covenant & [default]]
-  (or (spec/get-spec covenant) default))
-
-(defn covenant-kv
-  "Returns a spec where `covenant` is equal to `data` for a kv pair.
-
-   Use :strict true to fail valiation for additional keys."
-  [covenant & [{:keys [strict]}]]
-  (fn [data]
-    (let [k (if (vector? data) (key data) data)
-          v (if (vector? data) (val data) data)]
-      (= v (get covenant k (when-not strict v))))))
-
-(defn covenant-equal
-  "Returns a spec where `data` equals `covenant`."
-  [covenant]
-  (fn [data]
-    (= covenant data)))
-
-(defn covenant-spec
-  "Returns a spec from `covenant` or based on `data` type."
-  [covenant]
-  (fn [data]
-    (let [data (if (vector? data) (key data) data)]
-      (covenant* (get covenant data) covenant))))
-
-(defn covenant-contains
-  "Returns a spec where items within `covenant` contain `data`."
-  [covenant]
-  (fn [data]
-    (some (set covenant) (if (coll? data) data (list data)))))
+(spec/def ::empty   empty?)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Covenant Protocol ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -79,7 +45,42 @@
   (problems [covenant data] "See clojure.spec/explain-data.")
   (validate [covenant data] "See clojure.spec/valid?.")
   (spec     [covenant]      "Returns related spec for `covenant`."))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; Covenant Helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defn covenant*
+  "Returns a spec from `covenant` or `default`"
+  [covenant & [default]]
+  (or (spec/get-spec covenant) default))
+
+(defn covenant-equal
+  "Returns a spec where `data` equals `covenant`."
+  [covenant]
+  (fn [data]
+    (= covenant data)))
+
+(defn covenant-contains
+  "Returns a spec where items within `covenant` contain `data`."
+  [covenant]
+  (fn [data]
+    (let [data (if (coll? data) data (list data))]
+      (some covenant data))))
+
+(defn covenant-empty
+  "Returns a spec where `covenant` and `data` are checked for being empty."
+  [covenant]
+  (fn [data]
+    (= (empty? covenant) (empty? data))))
+
+(defn covenant-kv [covenant]
+  (spec/or
+    :kv-equal
+      (fn [[k v]] (= (get covenant k) v))
+    :kv-contains
+      (fn [[k v]] (some (set (get covenant k)) v))))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Covenant Protocol ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (extend-protocol ICovenant
 
   default
@@ -131,28 +132,36 @@
     (spec/and ::fn
       (covenant-equal covenant)))
 
+  EmptyList
+  (spec [covenant]
+    (spec/and ::list
+      (covenant-equal covenant)))
+
   List
   (spec [covenant]
     (spec/and ::list
-      (spec/coll-of
-        (covenant-contains covenant))))
+      (spec/or
+        :equal (covenant-equal covenant)
+        :contents (spec/coll-of (covenant-contains covenant)))))
 
   PersistentVector
   (spec [covenant]
     (spec/and ::vector
-      (spec/coll-of
-        (covenant-contains covenant))))
+      (spec/or
+        :equal (covenant-equal covenant)
+        :contents (spec/coll-of (covenant-contains covenant)))))
 
   PersistentHashSet
   (spec [covenant]
     (spec/and ::set
-      (spec/coll-of
-        (covenant-contains covenant))))
+      (spec/or
+        :equal (covenant-equal covenant)
+        :contents (spec/coll-of (covenant-contains covenant)))))
 
   PersistentArrayMap
   (spec [covenant]
-    (spec/merge ::map
-      (spec/keys :req-un (keys covenant))
+    (spec/and ::map
+      (covenant-empty covenant)
       (spec/coll-of
         (covenant-kv covenant)))))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
