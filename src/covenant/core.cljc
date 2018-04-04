@@ -72,12 +72,25 @@
   (fn [data]
     (= (empty? covenant) (empty? data))))
 
+(defmulti covenant-multi identity :default ::default)
+
+(defmethod covenant-multi ::default
+  [covenant [k v]]
+  (covenant* (get covenant k)))
+
 (defn covenant-kv [covenant]
   (spec/or
+    :kv-spec
+      (partial covenant-multi covenant)
+      ;(spec/multi-spec covenant-multi identity)
     :kv-equal
-      (fn [[k v]] (= (get covenant k) v))
+      (fn [[k v]]
+        (let [cov (get covenant k)]
+          (= cov v)))
     :kv-contains
-      (fn [[k v]] (some (set (get covenant k)) v))))
+      (fn [[k v]]
+        (let [cov (get covenant k)]
+          (some (set cov) v)))))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Covenant Protocol ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

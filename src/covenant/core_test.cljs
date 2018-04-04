@@ -102,3 +102,14 @@
   (is
    (covenant.core/validate v v)
    (str "Failed to validate " (pr-str v) " against itself."))))
+
+(def ??val-is-spec
+  (let [covenant {:any    :covenant.core/any
+                  :nil    :covenant.core/nil
+                  :number :covenant.core/number}
+        data     {:any    [1 #{} nil "str" 'symbol]
+                  :nil    nil
+                  :number 9}]
+    (is
+      (covenant.core/validate covenant data)
+      (covenant.core/explain  covenant data))))

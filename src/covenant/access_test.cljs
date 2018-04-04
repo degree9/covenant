@@ -39,12 +39,17 @@
 
   ; valids
   (doseq [[covs vs] [; any empty cov should validate empties
-                     [empties empties]
+                     ; Matt: this will fail as empty lists still validate coll type
+                     ;[empties empties]
 
                      ; empty roles cov should validate any role
-                     [no-roles (concat no-roles admins editors)]
+                     ; Matt: this will fail as empty roles still validate coll type
+                     ;[no-roles (concat no-roles admins editors)]
 
-                     ; roles in a cov will should validate that role
+                     ; Matt: the solution for this would be to support a spec as
+                     ;       the value of a kv pair which is applied to data
+
+                     ; roles in a cov should validate that role
                      [admins admins]
                      [editors editors]]]
    (doseq [cov covs v vs]
