@@ -4,20 +4,64 @@
   [cljs.test :refer-macros [deftest is]]))
 
 (deftest ??admin-role
- ; simplest case, a set of roles should validate against itself
- (covenant.core/explain {:roles #{:admin}} {:roles #{:admin}})
- (is
-   (covenant.core/validate {:roles #{:admin}} {:roles #{:admin}})
-   (str (pr-str {:roles #{:admin}}) " did not validate as admin"))
+ (let [admin {:roles #{:admin}}
+       editor {:roles #{:editor}}
+       editor+admin {:roles #{:admin :editor}}
 
- ; adding an extra role should not invalidate access
- (covenant.core/explain {:roles #{:admin}} {:roles #{:admin :editor}})
- (is
-   (covenant.core/validate {:roles #{:admin}} {:roles #{:admin :editor}})
-   (str (pr-str {:roles #{:admin :editor}}) " did not validate as admin"))
+       empty-map {}
+       empty-set #{}
+       empty-vec []
+       empty-list '()
 
- ; removing the admin role should not validate
- (doseq [t [{} {:roles #{}} {:roles #{:editor}}]]
-  (is
-   (not (covenant.core/validate {:roles #{:admin}} t))
-   (str (pr-str t) " validated as admin"))))
+       no-roles {:roles #{}}
+
+       empties [empty-map empty-set empty-vec empty-list empty-roles-set]
+
+       ; takes a list with set roles and extends it to have the same entries in
+       ; vectors and lists
+       with-seqs (fn [xs]
+                  (into xs
+                   (flatten
+                    (let [fns [seq vec]]
+                     (map
+                      (fn [f]
+                       (map
+                        (fn [x] (update x :roles f))
+                        xs))
+                      fns)))))
+
+       no-roles (with-seqs [empty-roles-set])
+       admins (with-seqs [admin editor+admin])
+       editors (with-seqs [editor editor+admin])
+       everything (concat empties admins editors)
+       not-empties (remove (set empties) everything)]
+  (prn admins)
+  ; valids
+  (doseq [[covs vs] [; any empty cov should validate empties
+                     [empties empties]
+
+                     ; empty roles cov should validate any role
+                     [no-roles (concat no-roles admins editors)]
+
+                     ; roles in a cov will should validate that role
+                     [admins admins]
+                     [editors editors]]]
+   (doseq [cov covs v vs]
+    (is
+     (covenant.core/validate cov v)
+     (covenant.core/problems cov v)))
+
+   ; invalids
+   (doseq [[covs vs] [; not empty cov fails an empty val
+                      [not-empties empties]
+
+                      ; empties fail anything with any role (including no role)
+                      [empties (concat no-roles admins editors)]
+
+                      ; can't validate with missing role
+                      [[admin] (concat empties no-roles [editor])]
+                      [[editor] (concat empties no-roles [admin])]]]
+    (doseq [cov covs v vs]
+     (is
+      (not (covenant.core/validate cov v))
+      (str "value " (pr-str v) " validated against covenant " (pr-str cov))))))))
