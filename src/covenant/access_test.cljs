@@ -13,16 +13,17 @@
        empty-vec []
        empty-list '()
 
-       no-roles {:roles #{}}
+       no-role {:roles #{}}
+       nil-role {:roles nil}
 
-       empties [empty-map empty-set empty-vec empty-list empty-roles-set]
+       empties [empty-map empty-set empty-vec empty-list]
 
        ; takes a list with set roles and extends it to have the same entries in
        ; vectors and lists
        with-seqs (fn [xs]
                   (into xs
                    (flatten
-                    (let [fns [seq vec]]
+                    (let [fns [sequence vec]]
                      (map
                       (fn [f]
                        (map
@@ -30,12 +31,12 @@
                         xs))
                       fns)))))
 
-       no-roles (with-seqs [empty-roles-set])
+       no-roles (with-seqs [no-role nil-role])
        admins (with-seqs [admin editor+admin])
        editors (with-seqs [editor editor+admin])
-       everything (concat empties admins editors)
+       everything (concat empties no-roles admins editors)
        not-empties (remove (set empties) everything)]
-  (prn admins)
+
   ; valids
   (doseq [[covs vs] [; any empty cov should validate empties
                      [empties empties]
