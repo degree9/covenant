@@ -91,6 +91,13 @@
       (fn [[k v]]
         (let [cov (get covenant k)]
           (some (set cov) v)))))
+
+(defn covenant-keys [covenant]
+  (fn [data]
+    (let [cov (keys covenant)
+          dat (keys data)]
+      (when-not (empty? cov)
+        (some (set cov) (set dat))))))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Covenant Protocol ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -142,39 +149,47 @@
 
   function
   (spec [covenant]
-    (spec/and ::fn
-      (covenant-equal covenant)))
+    ;; https://github.com/degree9/covenant/issues/25
+    ::fn)
 
   EmptyList
   (spec [covenant]
-    (spec/and ::list
-      (covenant-equal covenant)))
+    ::list)
+    ;(spec/and ::list
+    ;  (covenant-equal covenant))
 
   List
   (spec [covenant]
-    (spec/and ::list
-      (spec/or
-        :equal (covenant-equal covenant)
-        :contents (spec/coll-of (covenant-contains covenant)))))
+    ::list)
+    ;(spec/and ::list
+    ;  (spec/or
+    ;    :equal (covenant-equal covenant)
+    ;    :contents (spec/coll-of (covenant-contains covenant)))
 
   PersistentVector
   (spec [covenant]
-    (spec/and ::vector
-      (spec/or
-        :equal (covenant-equal covenant)
-        :contents (spec/coll-of (covenant-contains covenant)))))
+    ::vector)
+    ;(spec/and ::vector
+    ;  (spec/or
+    ;    :equal (covenant-equal covenant)
+    ;    :contents (spec/coll-of (covenant-contains covenant)))
 
   PersistentHashSet
   (spec [covenant]
-    (spec/and ::set
-      (spec/or
-        :equal (covenant-equal covenant)
-        :contents (spec/coll-of (covenant-contains covenant)))))
+    ::set)
+    ;(spec/and ::set
+    ;  (spec/or
+    ;    :equal (covenant-equal covenant)
+    ;    :contents (spec/coll-of (covenant-contains covenant)))
 
   PersistentArrayMap
   (spec [covenant]
-    (spec/and ::map
-      (covenant-empty covenant)
-      (spec/coll-of
-        (covenant-kv covenant)))))
+    ::map))
+    ;(spec/and ::map
+    ;  (spec/merge)))
+    ;    (covenant-keys covenant))))
+      ;(covenant-empty covenant))))
+      ;(spec/coll-of))))
+        ;(fn [data] (prn data) true)))))
+        ;(covenant-kv covenant)))))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
