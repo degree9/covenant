@@ -39,12 +39,12 @@
 ;; Covenant Protocol ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defprotocol ICovenant
   "Provides an abstraction for validating data using clojure.spec based on a covenant."
-  (assert   [covenant data] "See clojure.spec/assert.")
-  (conform  [covenant data] "See clojure.spec/conform.")
-  (explain  [covenant data] "See clojure.spec/explain.")
-  (problems [covenant data] "See clojure.spec/explain-data.")
-  (validate [covenant data] "See clojure.spec/valid?.")
-  (spec     [covenant]      "Returns related spec for `covenant`."))
+  (assert   [covenant data & opts] "See clojure.spec/assert.")
+  (conform  [covenant data & opts] "See clojure.spec/conform.")
+  (explain  [covenant data & opts] "See clojure.spec/explain.")
+  (problems [covenant data & opts] "See clojure.spec/explain-data.")
+  (validate [covenant data & opts] "See clojure.spec/valid?.")
+  (spec     [covenant & opts]      "Returns related spec for `covenant`."))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Covenant Helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -104,62 +104,62 @@
 (extend-protocol ICovenant
 
   default
-  (assert   [covenant data]
-    (spec/assert  (spec covenant) data))
-  (conform  [covenant data]
-    (spec/conform (spec covenant) data))
-  (explain  [covenant data]
-    (spec/explain (spec covenant) data))
-  (problems  [covenant data]
-    (spec/explain-data (spec covenant) data))
-  (validate [covenant data]
-    (spec/valid?  (spec covenant) data))
+  (assert   [covenant data & opts]
+    (spec/assert (spec covenant opts) data))
+  (conform  [covenant data & opts]
+    (spec/conform (spec covenant opts) data))
+  (explain  [covenant data & opts]
+    (spec/explain (spec covenant opts) data))
+  (problems  [covenant data & opts]
+    (spec/explain-data (spec covenant opts) data))
+  (validate [covenant data & opts]
+    (spec/valid? (spec covenant opts) data))
 
   object
-  (spec [covenant]
+  (spec [covenant & opts]
     (covenant* covenant ::object))
 
   nil
-  (spec [covenant]
+  (spec [covenant & opts]
     (covenant* covenant ::nil))
 
   number
-  (spec [covenant]
+  (spec [covenant & opts]
     (covenant* covenant ::number))
 
   char
-  (spec [covenant]
+  (spec [covenant & opts]
     (covenant* covenant ::char))
 
   string
-  (spec [covenant]
+  (spec [covenant & opts]
     (covenant* covenant ::string))
 
   boolean
-  (spec [covenant]
+  (spec [covenant & opts]
     (covenant* covenant ::bool))
 
   Keyword
-  (spec [covenant]
+  (spec [covenant & opts]
     (covenant* covenant ::keyword))
 
   Symbol
-  (spec [covenant]
+  (spec [covenant & opts]
     (covenant* covenant ::symbol))
 
   function
-  (spec [covenant]
+  (spec [covenant & opts]
     ;; https://github.com/degree9/covenant/issues/25
     ::fn)
 
   EmptyList
-  (spec [covenant]
+  (spec [covenant & opts]
     ::list)
     ;(spec/and ::list
     ;  (covenant-equal covenant))
 
   List
-  (spec [covenant]
+  (spec [covenant & opts]
     ::list)
     ;(spec/and ::list
     ;  (spec/or
@@ -167,7 +167,7 @@
     ;    :contents (spec/coll-of (covenant-contains covenant)))
 
   PersistentVector
-  (spec [covenant]
+  (spec [covenant & opts]
     ::vector)
     ;(spec/and ::vector
     ;  (spec/or
@@ -175,7 +175,7 @@
     ;    :contents (spec/coll-of (covenant-contains covenant)))
 
   PersistentHashSet
-  (spec [covenant]
+  (spec [covenant & opts]
     ::set)
     ;(spec/and ::set
     ;  (spec/or
@@ -183,7 +183,7 @@
     ;    :contents (spec/coll-of (covenant-contains covenant)))
 
   PersistentArrayMap
-  (spec [covenant]
+  (spec [covenant & opts]
     ::map))
     ;(spec/and ::map
     ;  (spec/merge)))
