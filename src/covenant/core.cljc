@@ -53,76 +53,76 @@
 ;; Covenant Protocol ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defprotocol ICovenant
   "Provides an abstraction for validating data using clojure.spec based on a covenant."
-  (-assert   [covenant data opts] "See clojure.spec/assert.")
-  (-conform  [covenant data opts] "See clojure.spec/conform.")
-  (-explain  [covenant data opts] "See clojure.spec/explain.")
-  (-problems [covenant data opts] "See clojure.spec/explain-data.")
-  (-validate [covenant data opts] "See clojure.spec/valid?.")
-  (-spec     [covenant opts]      "Returns related spec for `covenant`."))
+  (-assert   [covenant data ] "See clojure.spec/assert.")
+  (-conform  [covenant data ] "See clojure.spec/conform.")
+  (-explain  [covenant data ] "See clojure.spec/explain.")
+  (-problems [covenant data ] "See clojure.spec/explain-data.")
+  (-validate [covenant data ] "See clojure.spec/valid?.")
+  (-spec     [covenant ]      "Returns related spec for `covenant`."))
 
-(defn assert [covenant data & opts]
-  (-assert covenant data opts))
+(defn assert [covenant data]
+  (-assert covenant data))
 
-(defn conform [covenant data & opts]
-  (-conform covenant data opts))
+(defn conform [covenant data]
+  (-conform covenant data))
 
-(defn explain [covenant data & opts]
-  (-explain covenant data opts))
+(defn explain [covenant data]
+  (-explain covenant data))
 
-(defn problems [covenant data & opts]
-  (-problems covenant data opts))
+(defn problems [covenant data]
+  (-problems covenant data))
 
-(defn validate [covenant data & opts]
-  (-validate covenant data opts))
+(defn validate [covenant data]
+  (-validate covenant data))
 
-(defn spec [covenant & opts]
-  (-spec covenant opts))
+(defn spec [covenant ]
+  (-spec covenant))
 
 (extend-protocol ICovenant
 
   default
-  (-assert   [covenant data opts]
-    (spec/assert (spec covenant opts) data))
-  (-conform  [covenant data opts]
-    (spec/conform (spec covenant opts) data))
-  (-explain  [covenant data opts]
-    (spec/explain (spec covenant opts) data))
-  (-problems  [covenant data opts]
-    (spec/explain-data (spec covenant opts) data))
-  (-validate [covenant data opts]
-    (spec/valid? (spec covenant opts) data))
+  (-assert   [covenant data]
+    (spec/assert (spec covenant ) data))
+  (-conform  [covenant data]
+    (spec/conform (spec covenant ) data))
+  (-explain  [covenant data]
+    (spec/explain (spec covenant ) data))
+  (-problems  [covenant data]
+    (spec/explain-data (spec covenant ) data))
+  (-validate [covenant data]
+    (spec/valid? (spec covenant ) data))
 
   nil
-  (-spec [covenant opts]
+  (-spec [covenant]
     ;; nil cannot be anything other than nil
     ::nil)
 
   number
-  (-spec [covenant opts]
+  (-spec [covenant]
     ;; number must be a number and equal
     (spec/and ::number
       (covenant-equal covenant)))
 
   string
-  (-spec [covenant opts]
+  (-spec [covenant]
     ;; string must be a string and equal
     (spec/and ::string
       (covenant-equal covenant)))
 
   char
-  (-spec [covenant opts]
+  (-spec [covenant]
     ;; char must be a char and equal
     (spec/and ::char
       (covenant-equal covenant)))
 
   boolean
-  (-spec [covenant opts]
+  (-spec [covenant]
     ;; bool must be a bool and equal
     (spec/and ::bool
       (covenant-equal covenant)))
 
   Keyword
-  (-spec [covenant opts]
+  (-spec [covenant]
     ;; keyword could be a named spec
     (covenant-spec covenant
       ;; otherwise must be a keyword and equal
@@ -130,7 +130,7 @@
         (covenant-equal covenant))))
 
   Symbol
-  (-spec [covenant opts]
+  (-spec [covenant]
     ;; symbol could be a named spec
     (covenant-spec covenant
       ;; otherwise must be a symbol and equal
@@ -138,30 +138,30 @@
         (covenant-equal covenant))))
 
   object
-  (-spec [covenant opts]
+  (-spec [covenant]
     ;; object must be an object and equal
     (spec/and ::object
       (covenant-equal covenant)))
 
   function
-  (-spec [covenant opts]
+  (-spec [covenant]
     ;; function must be a function and equal
     (spec/and ::fn
       (covenant-equal covenant)))
 
   EmptyList
-  (-spec [covenant opts]
+  (-spec [covenant]
     ;; emptylist must be both a list and empty
     (spec/and ::list ::empty))
 
   List
-  (-spec [covenant opts]
+  (-spec [covenant]
     ;; list must be a list and equal
     (spec/and ::list
       (covenant-equal covenant)))
 
   map
-  (-spec [covenant opts]
+  (-spec [covenant]
     ;; map must be a map and equal
     (spec/and ::map
       (covenant-equal covenant))))
