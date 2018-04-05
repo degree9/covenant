@@ -4,112 +4,125 @@
   clojure.set
   [cljs.test :refer-macros [deftest is]]))
 
-(def bools #{true false})
-(def numbers #{-1 0 1 2 2.5 0.0 js/Infinity})
-(def falseys #{nil false})
-(def strings #{"foo" ""})
-(def chrs #{\a \b \c})
-(def keywords #{:foo :bar :foo/bar :foo.bar/baz})
-(def symbols #{'foo 'bar 'foo/bar 'foo.bar/baz})
-(def objects #{(js-obj) (clj->js {:foo :bar})})
-(def maps #{{:foo :bar} {1 2} {:foo :foo} {}})
-(def sets #{#{:foo} #{} #{1}})
-(def vectors #{[] [:foo :bar] [1 2]})
-(def lists #{(list) (list :foo :bar) (list 1 2)})
-(def fns #{#() (fn [] :foo)})
-(def everything
- (clojure.set/union
-  bools
-  numbers
-  falseys
-  strings
-  chrs
-  objects
-  maps
-  sets
-  vectors
-  lists
-  fns))
+;; Test Helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defn is-valid [covenants valids]
+  (doseq [c covenants v valids]
+    (is (covenant.core/validate c v)
+      (str "Covenant: " (pr-str c) " did not validate: " (pr-str v)))))
 
-(defn check-validate
- ([covenant valids]
-  (check-validate covenant valids
-   ; everything that is not valid is invalid
-   (clojure.set/difference
-    everything
-    valids)))
- ([covenant valids invalids]
-  (doseq [v valids]
-   ; v should validate against the explicit covenant passed in
-   (is
-    (covenant.core/validate covenant v)
-    (str "Failed to validate " (pr-str v) " against covenant " covenant)))
+(defn is-invalid [covenants invalids]
+  (doseq [c covenants i invalids]
+    (is (not (covenant.core/validate c i))
+      (str "Covenant: " (pr-str c) " validated: " (pr-str i)))))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-  ; https://github.com/degree9/covenant/issues/11
-  ; v should also be usable as a covenant for every other valid
-  ;(doseq [v valids]
-  ;  (is
-  ;    (covenant.core/validate v v)
-  ;    (str "Failed to validate " (pr-str v) "against covenant " (pr-str v)))))
+;; Covenant Tests ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(deftest ??anything
+  (let [covs     #{:covenant.core/any}
+        valids   #{nil 1 true "foo" :bar 'sym '() [] #{} {}}]
+    (is-valid covs valids)))
 
-  (doseq [v invalids]
-   (is
-    (not (covenant.core/validate covenant v))
-    (str "Failed to invalidate " (pr-str v) " against covenant " covenant)))))
+(deftest ??boolean
+  (let [covs     #{:covenant.core/bool true false}
+        valids   #{true false}
+        invalids #{nil 1 "foo" :bar '() [] #{} {}}]
+    (is-valid   covs   valids)
+    (is-valid   valids valids)
+    (is-invalid covs   invalids)))
 
-(deftest ??fn
- (check-validate :covenant.core/fn fns))
-
-(deftest ??any
- (check-validate :covenant.core/any everything))
-
-(deftest ??map
- (check-validate :covenant.core/map maps))
+(deftest ??number
+  (let [covs     #{:covenant.core/number -1 0 1 1.5}
+        valids   #{-1 0 1 2 2.5 0.0 js/Infinity}
+        invalids #{nil true "foo" :bar '() [] #{} {}}]
+    (is-valid   covs   valids)
+    (is-valid   valids valids)
+    (is-invalid covs   invalids)))
 
 (deftest ??nil
- (check-validate :covenant.core/nil #{nil}))
+  (let [covs     #{:covenant.core/nil nil}
+        valids   #{nil}
+        invalids #{1 true "foo" :bar '() [] #{} {}}]
+    (is-valid   covs   valids)
+    (is-valid   valids valids)
+    (is-invalid covs   invalids)))
 
-(deftest ??set
- (check-validate :covenant.core/set sets))
+(deftest ??string
+  (let [covs     #{:covenant.core/string "foo"}
+        valids   #{"bar" ""}
+        invalids #{1 true nil :bar '() [] #{} {}}]
+    (is-valid   covs   valids)
+    (is-valid   valids valids)
+    (is-invalid covs   invalids)))
 
 (deftest ??char
- (check-validate :covenant.core/char chrs))
+  (let [covs     #{:covenant.core/char \a}
+        valids   #{\b \c}
+        invalids #{1 true nil :bar 'sym '() [] #{} {}}]
+    (is-valid   covs   valids)
+    (is-valid   valids valids)
+    (is-invalid covs   invalids)))
 
-(def ??list
- (check-validate :covenant.core/list lists))
+(deftest ??keyword
+  (let [covs     #{:covenant.core/keyword :foo}
+        valids   #{:bar :foo/bar}
+        invalids #{1 true nil 'sym "baz" '() [] #{} {}}]
+    (is-valid   covs   valids)
+    (is-valid   valids valids)
+    (is-invalid covs   invalids)))
 
-(def ??boolean
- (check-validate :covenant.core/bool bools))
+(deftest ??symbol
+  (let [covs     #{:covenant.core/symbol 'foo}
+        valids   #{'bar 'foo/bar 'foo.bar/baz}
+        invalids #{1 true nil :baz "baz" '() [] #{} {}}]
+    (is-valid   covs   valids)
+    (is-valid   valids valids)
+    (is-invalid covs   invalids)))
 
-(def ??number
- (check-validate :covenant.core/number numbers))
+(deftest ??object
+  (let [covs     #{:covenant.core/object #js{}}
+        valids   #{#js{} (js-obj) (clj->js {:foo :bar})}
+        invalids #{1 true nil :bar "baz" 'sym '() [] #{} {}}]
+    (is-valid   covs   valids)
+    (is-valid   valids valids)
+    (is-invalid covs   invalids)))
 
-(def ??string
- (check-validate :covenant.core/string (clojure.set/union strings chrs)))
+(deftest ??function
+  (let [covs     #{:covenant.core/fn #()}
+        valids   #{#() (fn [] :foo)}
+        invalids #{1 true nil :bar "baz" 'sym '() [] #{} {}}]
+    (is-valid   covs   valids)
+    (is-valid   valids valids)
+    (is-invalid covs   invalids)))
 
-(def ??symbol
- (check-validate :covenant.core/symbol symbols))
+(deftest ??list
+  (let [covs     #{:covenant.core/list '()}
+        valids   #{'() (list) (list :foo :bar) (list 1 2)}
+        invalids #{1 true nil :bar "baz" 'sym [] #{} {}}]
+    (is-valid   covs   valids)
+    (is-valid   valids valids)
+    (is-invalid covs   invalids)))
 
-(def ??vector
- (check-validate :covenant.core/vector vectors))
+(deftest ??vector
+  (let [covs     #{:covenant.core/vector []}
+        valids   #{[] (vector) (vector :foo :bar) [1 2]}
+        invalids #{1 true nil :bar "baz" 'sym (list) #{} {}}]
+    (is-valid   covs   valids)
+    (is-valid   valids valids)
+    (is-invalid covs   invalids)))
 
-(def ??keyword
- (check-validate :covenant.core/keyword keywords))
+(deftest ??set
+  (let [covs     #{:covenant.core/set #{}}
+        valids   #{#{} (hash-set) (hash-set :foo :bar) #{1 2}}
+        invalids #{1 true nil :bar "baz" 'sym (list) [] {}}]
+    (is-valid   covs   valids)
+    (is-valid   valids valids)
+    (is-invalid covs   invalids)))
 
-(def ??val-as-covenant
- (doseq [v everything]
-   (covenant.core/explain v v)
-  (is
-   (covenant.core/validate v v)
-   (str "Failed to validate " (pr-str v) " against itself."))))
-
-(def ??val-is-spec
-  (let [covenant {:any    :covenant.core/any
-                  :nil    :covenant.core/nil
-                  :number :covenant.core/number}
-        data     {:any    [1 #{} nil "str" 'symbol]
-                  :nil    nil
-                  :number 9}]
-    (is
-      (covenant.core/validate covenant data)
-      (covenant.core/explain  covenant data))))
+(deftest ??map
+  (let [covs     #{:covenant.core/map {}}
+        valids   #{{} (hash-map) {:foo :bar} {"foo" "bar"}}
+        invalids #{1 true nil :bar "baz" 'sym (list) [] #{}}]
+    (is-valid   covs   valids)
+    (is-valid   valids valids)
+    (is-invalid covs   invalids)))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
