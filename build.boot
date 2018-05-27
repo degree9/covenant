@@ -39,6 +39,23 @@
     (watch)
     (build-jar)))
 
+(deftask test-schema
+  "Run tests for Schema."
+  []
+  (test-cljs :namespaces ['covenant.schema-test]))
+
+(deftask test-rbac
+  "Run tests for RBAC."
+  []
+  (test-cljs :namespaces ['covenant.rbac-test]))
+
+(deftask testing
+  "Run tests for everything."
+  []
+  (comp
+    (test-schema)
+    (test-rbac)))
+
 (def test-cljs-options {:process-shim false})
 
 (replace-task!

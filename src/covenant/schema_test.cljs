@@ -1,22 +1,11 @@
-(ns covenant.core-test
+(ns covenant.schema-test
  (:require
-  covenant.core
+  covenant.schema
   clojure.set
-  [cljs.test :refer-macros [deftest is]]))
+  [covenant.test :refer [is-valid is-invalid]]
+  [cljs.test :refer-macros [deftest]]))
 
-;; Test Helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defn is-valid [covenants valids]
-  (doseq [c covenants v valids]
-    (is (covenant.core/validate c v)
-      (str "Covenant: " (pr-str c) " did not validate: " (pr-str v)))))
-
-(defn is-invalid [covenants invalids]
-  (doseq [c covenants i invalids]
-    (is (not (covenant.core/validate c i))
-      (str "Covenant: " (pr-str c) " validated: " (pr-str i)))))
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; Covenant Tests ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Schema Tests ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (deftest ??anything
   (let [covs     #{:covenant.core/any}
         valids   #{nil 1 true "foo" :bar 'sym '() [] #{} {}}]
@@ -80,7 +69,7 @@
 
 (deftest ??function
   (let [covs     #{:covenant.core/fn}
-        valids   #{#() (fn [] :foo)}
+        valids   #{#() identity}
         invalids #{1 true nil :bar "baz" 'sym '() [] #{} {}}]
     (is-valid   covs   valids)
     (is-invalid valids invalids)))
