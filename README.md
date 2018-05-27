@@ -10,10 +10,10 @@ Access Control and Data Validation for Clojure(Script) written in Clojure Spec.
 > A covenant, is a solemn promise to engage in or refrain from a specified action. - [Wikipedia](https://en.wikipedia.org/wiki/Covenant_(law))
 
 Covenant is divided into a few namespaces:
-- `covenant.core` compares data structures and enables creation of spec's from data.
+- `covenant.schema` type/value based data comparison on top of spec.
 - `covenant.acl` provides covenants around Access Control List's (ACL)
-- `covenant.roles` provides covenants around Role Based Access Control (RBAC)
-- `covenant.attributes` provides covenants around Attribute Based Access Control (ABAC)
+- `covenant.rbac` provides covenants around Role Based Access Control (RBAC)
+- `covenant.abac` provides covenants around Attribute Based Access Control (ABAC)
 
 Within this project the term `covenant` may refer to one the following:
 
