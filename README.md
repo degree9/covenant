@@ -10,25 +10,15 @@ Access Control and Data Validation for Clojure(Script) written in Clojure Spec.
 > A covenant, is a solemn promise to engage in or refrain from a specified action. - [Wikipedia](https://en.wikipedia.org/wiki/Covenant_(law))
 
 Covenant is divided into a few namespaces:
-- `covenant.schema` type/value based data comparison on top of spec.
-- `covenant.acl` provides covenants around Access Control List's (ACL)
-- `covenant.rbac` provides covenants around Role Based Access Control (RBAC)
-- `covenant.abac` provides covenants around Attribute Based Access Control (ABAC)
-
-Within this project the term `covenant` may refer to one the following:
-
-1. A Clojure Spec
-2. A Clojure Data Structure
-3. Any combination of 1. and 2.
-
-### Notes on Comparison ###
-
-- When comparing primitives, types are compared not values.
-- When comparing lists, contents are compared.
+- `covenant.core` ICovenant protocol and public api.
+- `covenant.schema` type/value based data comparison on top of clojure.spec.
+- `covenant.acl` provides covenants around Access Control List's (ACL).
+- `covenant.rbac` provides covenants around Role Based Access Control (RBAC).
+- `covenant.abac` provides covenants around Attribute Based Access Control (ABAC).
 
 ## Usage ##
 
-### Protocol fns
+### `ICovenant` Protocol
 
 Covenant exposes a protocol that closely matches cljs native spec.
 
@@ -64,30 +54,4 @@ A vanilla spec + scalar primitive will pass `covenant/explain`.
 (covenant/explain :covenant.core/number 1)
 ; =>
 ;Success!
-```
-
-Scalar values can be used as a covenant for other values of the same type.
-
-```clojure
-(covenant/validate true true) ; true
-(covenant/validate true false) ; true
-(covenant/validate true 1) ; false
-(covenant/validate 1 1) ; true
-(covenant/validate 1 0) ; true
-(covenant/validate 1 false) ; false
-```
-
-A collection is compared against its type _and_ values.
-
-```clojure
-(covenant/explain [1 2 3] [4 5 6])
-; =>
-;In: [0] val: 4 fails predicate: (covenant-spec covenant)
-;In: [1] val: 5 fails predicate: (covenant-spec covenant)
-;In: [2] val: 6 fails predicate: (covenant-spec covenant)
-
-(covenant/explain {:go "have" :some ['fun]} {:go "have" :some ['soup]} )
-; =>
-;In: [1] val: [:some [soup]] fails at: [:spec] predicate: (covenant-spec covenant)
-;In: [1] val: [:some [soup]] fails at: [:kv] predicate: (covenant-kv covenant)
 ```
