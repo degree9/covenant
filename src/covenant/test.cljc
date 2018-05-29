@@ -1,6 +1,8 @@
 (ns covenant.test
-  (:require [covenant.core :as core]
-            [cljs.test :refer-macros [is]]))
+ (:require 
+  [covenant.core :as core]
+  [clojure.test :refer [is]]))
+
 ;; Test Helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn is-valid [covenants valids]
   (doseq [c covenants v valids]

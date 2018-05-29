@@ -59,14 +59,16 @@
 (deftask test-schema
   "Run tests for Schema."
   []
-  (test-cljs :namespaces ['covenant.schema-test])
-  (test :namespaces ['covenant.schema-test]))
+  (comp
+   (test-cljs :namespaces ['covenant.schema-test])
+   (test :namespaces ['covenant.schema-test])))
 
 (deftask test-rbac
   "Run tests for RBAC."
   []
-  (test-cljs :namespaces ['covenant.rbac-test])
-  (test :namespaces ['covenant.rbac-test]))
+  (comp
+   (test-cljs :namespaces ['covenant.rbac-test])
+   (test :namespaces ['covenant.rbac-test])))
 
 (deftask testing
   "Run tests for everything."
