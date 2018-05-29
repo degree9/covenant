@@ -1,8 +1,7 @@
 (ns covenant.core
-  (:refer-clojure :exclude [assert])
-  (:require
-    #?(:clj [clojure.spec.alpha :as spec]
-       :cljs [cljs.spec.alpha :as spec])))
+ (:refer-clojure :exclude [assert])
+ (:require
+  [clojure.spec.alpha :as spec]))
 
 ;; Basic Covenants ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (spec/def ::fn      fn?)
@@ -52,12 +51,12 @@
 ;; Covenant Protocol ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defprotocol ICovenant
   "Provides an abstraction for validating data using clojure.spec based on a covenant."
-  (-assert   [covenant data ] "See clojure.spec/assert.")
-  (-conform  [covenant data ] "See clojure.spec/conform.")
-  (-explain  [covenant data ] "See clojure.spec/explain.")
-  (-problems [covenant data ] "See clojure.spec/explain-data.")
-  (-validate [covenant data ] "See clojure.spec/valid?.")
-  (-spec     [covenant ]      "Returns related spec for `covenant`."))
+  (-assert   [covenant data] "See clojure.spec/assert.")
+  (-conform  [covenant data] "See clojure.spec/conform.")
+  (-explain  [covenant data] "See clojure.spec/explain.")
+  (-problems [covenant data] "See clojure.spec/explain-data.")
+  (-validate [covenant data] "See clojure.spec/valid?.")
+  (-spec     [covenant]      "Returns related spec for `covenant`."))
 
 (defn assert [covenant data]
   (-assert covenant data))
