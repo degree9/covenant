@@ -42,6 +42,12 @@ A simple example is that `(covenant.core/spec nil)` will return
 Scalar primitives simply return a spec/predicate based on their data type while
 collections also compare their contents.
 
+### RBAC
+
+`covenant.rbac` provides validation fns that are "loose" for collections.
+
+If the values of the
+
 ### Examples
 
 `(:require covenant.core :as covenant)`

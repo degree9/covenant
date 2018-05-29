@@ -31,7 +31,7 @@
 
 (spec/def ::keyword keyword?)
 
-(spec/def ::object  object?)
+#?(:cljs (spec/def ::object  object?))
 
 (spec/def ::empty   empty?)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
