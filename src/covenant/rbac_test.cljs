@@ -6,10 +6,12 @@
 
 ;; RBAC Tests ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (deftest ??roles-rbac
-  (let [admin  [{:roles [:admin]}]
-        editor [{:roles [:editor]}]
-        both   [{:roles [:editor :admin]}]
-        none   ['() [] #{} {} {:roles []} {:roles nil}]]
+  (let [rand-coll (fn [c] ((rand-nth [vec seq set]) c))
+        roles (fn [& rs] {:roles (rand-coll rs)})
+        admin  [(roles :admin)]
+        editor [(roles :editor)]
+        both   [(roles :editor :admin)]
+        none   ['() [] #{} {} (roles)]]
     ;; data containd :admin role
     (is-valid admin admin)
     ;; data containd :admin and :editor roles
