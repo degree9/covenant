@@ -2,7 +2,7 @@
  (:require
    covenant.rbac
    [covenant.test :refer [is-valid is-invalid]]
-   [cljs.test :refer-macros [deftest]]))
+   [clojure.test :refer [deftest]]))
 
 ;; RBAC Tests ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (deftest ??roles-rbac

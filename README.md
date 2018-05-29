@@ -42,6 +42,22 @@ A simple example is that `(covenant.core/spec nil)` will return
 Scalar primitives simply return a spec/predicate based on their data type while
 collections also compare their contents.
 
+### RBAC
+
+`covenant.rbac` provides validation fns that are "loose" for collections.
+
+If some values in the passed collection (deep) matches the passed covenant then
+`covenant.core/validate` returns `true` after `covenant.rbac` has been required.
+
+```clojure
+(require 'covenant.rbac)
+(covenant.core/validate {:roles [:admin :editor]} {:roles [:admin]}) ; true
+(covenant.core/validate {:roles [:admin :editor]} {:roles [:admin :editor]}) ; true
+(covenant.core/validate {:roles [:admin :editor]} {:roles [:editor]}) ; true
+(covenant.core/validate {:roles [:admin :editor]} {:roles []}) ; false
+(covenant.core/validate {:roles [:admin :editor]} {:roles [:foo]}) ; false
+```
+
 ### Examples
 
 `(:require covenant.core :as covenant)`
