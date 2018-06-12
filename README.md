@@ -1,4 +1,4 @@
-# covenant #
+# Covenant #
 [![Clojars Project](https://img.shields.io/clojars/v/degree9/covenant.svg)](https://clojars.org/degree9/covenant)
 [![Dependencies Status](https://jarkeeper.com/degree9/covenant/status.svg)](https://jarkeeper.com/degree9/covenant)
 [![Downloads](https://jarkeeper.com/degree9/covenant/downloads.svg)](https://jarkeeper.com/degree9/covenant)
@@ -16,7 +16,7 @@ Access Control and Data Validation for Clojure(Script) written in Clojure Spec.
     <img width="135" src="http://degree9.io/images/degree9.png">
   </a>
   <br>
-  <b>D9 Enterprise is developed and maintained by Degree9</b>
+  <b>Covenant is developed and maintained by Degree9</b>
 </p>
 
 ---
