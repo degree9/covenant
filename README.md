@@ -9,6 +9,18 @@ Access Control and Data Validation for Clojure(Script) written in Clojure Spec.
 
 > A covenant, is a solemn promise to engage in or refrain from a specified action. - [Wikipedia](https://en.wikipedia.org/wiki/Covenant_(law))
 
+---
+
+<p align="center">
+  <a href="https://degree9.io" align="center">
+    <img width="135" src="http://degree9.io/images/degree9.png">
+  </a>
+  <br>
+  <b>D9 Enterprise is developed and maintained by Degree9</b>
+</p>
+
+---
+
 Covenant is divided into a few namespaces:
 - `covenant.core` ICovenant protocol and public api.
 - `covenant.schema` type/value based data comparison on top of clojure.spec.
