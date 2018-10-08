@@ -1,7 +1,8 @@
-# Covenant #
+# Covenant
+
 [![Clojars Project](https://img.shields.io/clojars/v/degree9/covenant.svg)](https://clojars.org/degree9/covenant)
-[![Dependencies Status](https://jarkeeper.com/degree9/covenant/status.svg)](https://jarkeeper.com/degree9/covenant)
-[![Downloads](https://jarkeeper.com/degree9/covenant/downloads.svg)](https://jarkeeper.com/degree9/covenant)
+[![Dependencies Status](https://versions.deps.co/degree9/covenant/status.svg)](https://versions.deps.co/degree9/covenant)
+[![Downloads](https://versions.deps.co/degree9/covenant/downloads.svg)](https://versions.deps.co/degree9/covenant)
 [![CircleCI](https://circleci.com/gh/degree9/covenant/tree/master.svg?style=shield)](https://circleci.com/gh/degree9/covenant/tree/master)
 <!-- [![Medium](https://img.shields.io/badge/medium-read-blue.svg)](https://medium.com/degree9/boot-covenant-e1453826b732) -->
 
